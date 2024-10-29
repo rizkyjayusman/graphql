@@ -1,0 +1,38 @@
+ type Company {
+     id: ID!
+     name: String!
+     address: String
+     employees: [Employee]
+ }
+
+ type Employee {
+     id: ID!
+     name: String!
+     position: String
+     salary: Float
+     company: Company
+ }
+
+ type Query {
+     companies: [Company]
+     employees: [Employee]
+     companyById(id: ID!): Company
+     employeeById(id: ID!): Employee
+ }
+
+ input EmployeeInput {
+     name: String!
+     position: String!
+     salary: Float!
+     companyId: ID!
+ }
+
+  input CompanyInput {
+      name: String!
+      address: String
+  }
+
+ type Mutation {
+     createCompany(companyInput: CompanyInput): Company
+     createEmployee(employeeInput: EmployeeInput): Employee
+ }
