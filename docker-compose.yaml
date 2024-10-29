@@ -14,6 +14,15 @@ services:
     networks:
       - graphql-net
   
+  graphql-client:
+    build: ./graphql-client
+    ports:  
+      - "3000"
+    environment:
+      GRAPHQL_SERVER_URI: ${GRAPHQL_SERVER_URI}
+    networks:
+      - graphql-net
+  
   nginx:
     image: nginx:latest
     volumes:
