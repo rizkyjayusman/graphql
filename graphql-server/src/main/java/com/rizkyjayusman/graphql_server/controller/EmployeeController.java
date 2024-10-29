@@ -2,7 +2,6 @@ package com.rizkyjayusman.graphql_server.controller;
 import com.rizkyjayusman.graphql_server.input.EmployeeInput;
 import com.rizkyjayusman.graphql_server.model.Employee;
 import com.rizkyjayusman.graphql_server.service.EmployeeService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -28,7 +27,7 @@ public class EmployeeController {
     }
 
     @MutationMapping
-    public Employee createEmployee(@Argument @Valid EmployeeInput employeeInput) {
+    public Employee createEmployee(@Argument EmployeeInput employeeInput) {
         return employeeService.createEmployee(employeeInput.getName(), employeeInput.getPosition(), employeeInput.getSalary(), employeeInput.getCompanyId());
     }
 }
