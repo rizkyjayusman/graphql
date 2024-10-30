@@ -1,51 +1,61 @@
 import React from 'react';
-import { gql, useQuery } from '@apollo/client';
 import { useTable } from 'react-table';
+import { gql, useQuery } from '@apollo/client';
+import { useParams } from 'react-router-dom';
 
-const GET_COMPANIES = gql`
-  query {
-    companies {
+const COMPANY_BY_ID = gql`
+  query companyById($id: ID!) {
+    companyById(id: $id) {
+      name
+      address
+      employees {
         id
         name
-        address
+      }
     }
   }
 `;
 
+const CompanyDetail = () => {
+  const { id } = useParams();
 
-const CompanyList = () => {
-
-  const { loading, error, data } = useQuery(GET_COMPANIES);
+  const { loading, error, data } = useQuery(COMPANY_BY_ID, {
+    variables: { id },
+  });
 
   const columns = React.useMemo(
     () => [
       { Header: 'Name', accessor: 'name' },
-      { Header: 'Address', accessor: 'address' },
       {
         Header: 'Action',
         Cell: ({ row }) => (
-          <a href={`/companies/${row.original.id}`} className="text-blue-500 hover:underline">Detail</a>
+          <a href={`/employees/${row.original.id}`} className="text-blue-500 hover:underline">Detail</a>
         ),
       },
     ],
     []
   );
 
-  const tableData = data ? data.companies : [];
-  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
-    useTable({
-      columns,
-      data: tableData,
-    });
+  const tableData = data?.companyById?.employees || [];
+  
+  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({
+    columns,
+    data: tableData,
+  });
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
+  if (!data || !data.companyById) return <p>No data available</p>;
 
+  const { name, address } = data.companyById;
+  
   return (
     <div className="flex flex-col items-center">
-      <div>
-        <h2 className="m-5">Company List</h2>
+      <div className="m-5 text-center">
+        <h2>{name}</h2>
+        <p>{address ?? '-'}</p>
       </div>
+
       <div>
         <table {...getTableProps()} className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
           <thead>
@@ -61,7 +71,7 @@ const CompanyList = () => {
             {rows.map((row) => {
               prepareRow(row);
               return (
-                <tr {...row.getRowProps()} className="border-b border-gray-200 hover:bg-gray-100">
+                <tr {...row.getRowProps({ key: row.original.id })} className="border-b border-gray-200 hover:bg-gray-100">
                   {row.cells.map((cell) => (
                     <td {...cell.getCellProps()} className="py-3 px-6 text-left">{cell.render('Cell')}</td>
                   ))}
@@ -75,4 +85,4 @@ const CompanyList = () => {
   );
 };
 
-export default CompanyList;
+export default CompanyDetail;
